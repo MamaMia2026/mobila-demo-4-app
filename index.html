@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>FORMA Studio – Configurator Canapea AXIS (machetă demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== comun: reset, utilitare, configurator, coș, favorite, toast ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#141516;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit}
+a{color:inherit;text-decoration:none}
+svg{display:block}
+.ico svg,.ib svg{width:1em;height:1em}
+.oswald,.p-title,.p-price,.sticky-price,.infos h3{font-family:Oswald,"Barlow Condensed",Impact,sans-serif}
+@media (max-width:768px){.d{display:none!important}}
+@media (min-width:769px){.m{display:none!important}}
+.badge{position:absolute;top:-6px;right:-8px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#F85C40;color:#fff;font:600 11px/18px Inter,sans-serif;text-align:center}
+.badge.zero{display:none}
+.badge.show-zero.zero{display:block}
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#1a1c1d;color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:200;max-width:92vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:768px){#toast{bottom:84px}}
+
+/* ---- configurator ---- */
+.cfg-grid{display:grid;grid-template-columns:59fr 41fr;gap:6px}
+.gal{background:#e6e6e4;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.gal-main{position:relative;flex:1;background:#c9c9c9;perspective:900px}
+.gal-main img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.gal-main.spin img{animation:spin3d 6s linear infinite}
+@keyframes spin3d{0%{transform:rotateY(0) scale(.96)}50%{transform:rotateY(14deg) scale(.96)}100%{transform:rotateY(0) scale(.96)}}
+.gal-tools{position:absolute;left:30px;right:30px;bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.gal-view{display:flex;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);border-radius:10px;padding:0}
+.gv{display:flex;align-items:center;gap:9px;padding:0 20px;height:40px;border-radius:10px;font-weight:500;font-size:16px;color:#1c1c1c}
+.gv.on{background:#fff;font-weight:600}
+.gv svg{width:20px;height:20px}
+.gv i{display:flex}
+.gal-rot{display:flex;align-items:center;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);border-radius:10px;height:40px}
+.gal-rot i{width:1px;height:22px;background:rgba(0,0,0,.25)}
+.gr{width:52px;height:40px;display:grid;place-items:center}
+.gr svg{width:20px;height:20px}
+.gal-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px 30px 16px;background:#e6e6e4}
+.th{border-radius:10px;overflow:hidden;border:2.5px solid transparent;background:#d2d2d0;aspect-ratio:200/104}
+.th.on{border-color:#F85C40}
+.th img{width:100%;height:100%;object-fit:cover}
+.panel{background:#f4f4f2;border-radius:12px;padding:26px 28px 24px}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.p-title{font-size:52px;line-height:1;font-weight:700;text-transform:uppercase;letter-spacing:-.01em;color:#161718}
+.p-price{font-size:34px;line-height:1.3;font-weight:600;white-space:nowrap;color:#161718}
+.p-sub{margin:14px 0 18px;font-size:15px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;color:#2a2a2a}
+.row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:10px;padding:9px 0}
+.row-l b{display:block;font-size:16px;font-weight:600;color:#161718}
+.row-l span{display:block;font-size:13px;color:#555;line-height:1.35;margin-top:2px}
+.seg{display:flex;background:#e6e4e3;border-radius:10px;padding:0}
+.seg-btn{flex:1;height:38px;border-radius:10px;font-size:15px;font-weight:500;color:#2a2a2a;white-space:nowrap}
+.seg-btn.on{background:#FE593E;color:#fff;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:9px;background:#e6e4e3;border:2px solid transparent;border-radius:10px;padding:4px 12px 4px 4px;height:46px;font-size:14px;font-weight:500;color:#1c1c1c;white-space:nowrap}
+.chip-sw{width:36px;height:36px;border-radius:8px;overflow:hidden;flex:none}
+.chip-sw img{width:100%;height:100%;object-fit:cover}
+.chip-ck{display:none;width:16px;height:16px}
+.chip-ck svg{width:16px;height:16px}
+.chip.on{background:#fff;border-color:#F85C40;font-weight:600}
+.chip.on .chip-ck{display:block}
+.row-dim{border-top:1px solid #d9d8d5;border-bottom:1px solid #d9d8d5;margin-top:10px;padding:16px 0}
+.dim-wrap{display:flex;flex-direction:column;align-items:center}
+.dim-draw{display:flex;align-items:flex-end;gap:4%;width:100%;max-width:420px}
+.dim-draw svg{height:auto}
+.dim-front{width:60%}
+.dim-side{width:36%}
+.dim-m{font-size:14px;font-weight:600;margin-top:4px;color:#161718}
+.row-ship{padding:16px 0 6px;grid-template-columns:160px 1fr;gap:14px}
+.ship-l{display:flex;gap:12px;align-items:center}
+.ship-ico svg{width:34px;height:34px}
+.ship{display:flex;gap:10px}
+.ship-in{display:flex;align-items:center;gap:8px;flex:1;background:#fff;border:1px solid #cfcfcc;border-radius:9px;padding:0 12px;height:40px;color:#444}
+.ship-in svg{width:18px;height:18px;color:#333}
+.ship-in input{border:0;outline:0;background:none;flex:1;width:100%;min-width:0;font-size:14px;color:#161718}
+.ship-in input::placeholder{color:#777}
+.btn-verify{background:#b9babb;color:#fff;font-weight:600;font-size:15px;border-radius:9px;padding:0 18px;height:40px}
+.ship-msg{grid-column:1/-1;font-size:13px;line-height:1.4;min-height:0}
+.ship-msg.ok{color:#1d7a3a}
+.ship-msg.err{color:#c0392b}
+.ship-msg:empty{display:none}
+.cta{display:grid;grid-template-columns:1fr 170px;gap:14px;margin-top:14px}
+.btn-add{display:flex;align-items:center;justify-content:center;gap:12px;background:#FE593E;color:#fff;border-radius:10px;height:56px;font-size:21px;font-weight:600}
+.btn-add:hover{background:#ee4d33}
+.btn-add svg{width:26px;height:26px}
+.btn-save{display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1.5px solid #cfcfcc;border-radius:10px;height:56px;font-size:19px;font-weight:500;color:#161718}
+.btn-save svg{width:22px;height:22px}
+.btn-save.on{border-color:#F85C40;color:#F85C40}
+.btn-save.on svg{fill:#F85C40}
+.infos{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:12px 0 0}
+.infos article{background:#2b2e30;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:20px 22px 22px;color:#fff}
+.infos h3{display:flex;justify-content:space-between;align-items:center;font-size:27px;font-weight:700;text-transform:uppercase;letter-spacing:.005em;line-height:1}
+.infos h3 svg{width:28px;height:28px;stroke-width:1.6}
+.infos p{margin-top:14px;font-size:14px;line-height:1.5;color:#e8e8e8}
+.infos p b{font-weight:600;color:#fff}
+.btn-samples,.acc,.sticky,.dim-m{display:none}
+
+@media (max-width:768px){
+  .cfg-grid{grid-template-columns:1fr;gap:0}
+  .gal{border-radius:0;background:#c8c8c9}
+  .gal-main{flex:none;background:#c8c8c9;perspective:600px}
+  .gal-main img{height:auto;aspect-ratio:887/297;object-fit:cover}
+  .gal-tools{position:static;justify-content:center;padding:4px 0 12px}
+  .gal-rot{display:none}
+  .gal-view{background:#e4e4e2;border-radius:24px;padding:4px}
+  .gv{height:36px;padding:0 20px;border-radius:20px;font-size:15px}
+  .gv.on{background:#2a2a2a;color:#fff}
+  .gv svg{width:18px;height:18px}
+  .gv:first-child>svg{display:none}
+  .gal-thumbs{gap:8px;padding:4px 16px 14px;background:#c8c8c9}
+  .th{aspect-ratio:190/115;border-radius:8px}
+  .panel{border-radius:0;padding:18px 16px 10px;background:#f5f4f2}
+  .panel-head{align-items:baseline}
+  .p-title{font-size:32px}
+  .p-price{font-size:28px;font-weight:700;text-transform:uppercase}
+  .p-sub{display:none}
+  .row{grid-template-columns:118px 1fr;gap:8px;padding:12px 0;border-top:1px solid #dad9d6}
+  .row:nth-of-type(2){border-top:0}
+  .row-l b{font-family:"Barlow Condensed",Oswald,sans-serif;text-transform:uppercase;font-size:17px;letter-spacing:.01em;font-weight:700}
+  .row-l span{font-size:11.5px}
+  .seg{background:none;gap:6px}
+  .seg-btn{height:38px;background:#e6e6e4;border-radius:8px;font-size:14px;font-weight:600;padding:0 6px}
+  .seg-btn.on{background:#F85C40}
+  .bigsw{display:flex;gap:14px;justify-content:space-between}
+  .bsw{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+  .bsw-img{position:relative;width:62px;height:62px;border-radius:12px;overflow:hidden;display:block;border:2px solid transparent}
+  .bsw-img img{width:100%;height:100%;object-fit:cover}
+  .bsw-img i{position:absolute;inset:0;display:none;place-items:center;color:#fff}
+  .bsw-img i svg{width:26px;height:26px}
+  .bsw.on .bsw-img{border-color:#F85C40;box-shadow:0 0 0 2px #fff inset}
+  .bsw.on .bsw-img i{display:grid}
+  .bsw-l{font-size:13px;font-weight:600;color:#1a1a1a}
+  .row-dim{border-bottom:0;margin-top:0}
+  .dim-wrap{align-items:center}
+  .dim-draw{gap:4%;max-width:none}
+  .dim-m{display:block;font-size:13px}
+  .btn-samples{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:44px;border:1.5px solid #1a1a1a;border-radius:8px;font-family:"Barlow Condensed",Oswald,sans-serif;text-transform:uppercase;font-size:17px;font-weight:700;letter-spacing:.02em;margin:4px 0 12px;color:#1a1a1a}
+  .btn-samples svg{width:24px;height:24px}
+  .row-ship{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;background:#dededc;border-radius:8px;padding:10px 10px;border-top:0;margin-top:2px}
+  .ship-l{min-width:0;align-items:center;gap:8px}
+  .ship-l>div{min-width:0}
+  .ship-l b{font-family:"Barlow Condensed",Oswald,sans-serif;text-transform:uppercase;font-size:15px;font-weight:700;letter-spacing:.01em}
+  .ship-l span{font-size:10.5px;line-height:1.3}
+  .ship-ico{display:block}
+  .ship-ico svg{width:26px;height:26px}
+  .ship{gap:6px;min-width:0}
+  .ship-in{height:38px;border-color:#b9b9b6;padding:0 7px;gap:4px;flex:none;width:128px}
+  .ship-in svg{width:14px;height:14px}
+  .ship-in input{font-size:10.5px}
+  .btn-verify{background:#1d1f21;text-transform:uppercase;font-family:"Barlow Condensed",Oswald,sans-serif;font-size:13.5px;letter-spacing:.02em;padding:0 8px;height:38px}
+  .ship-msg{width:100%}
+  .acc{display:block;margin:12px 0 0;border-top:1px solid #d6d5d2}
+  .acc details{border-bottom:1px solid #d6d5d2}
+  .acc summary{display:flex;justify-content:space-between;align-items:center;list-style:none;padding:12px 10px 12px 12px;font-family:"Barlow Condensed",Oswald,sans-serif;text-transform:uppercase;font-size:18px;font-weight:700;letter-spacing:.01em;cursor:pointer;color:#141414}
+  .acc summary::-webkit-details-marker{display:none}
+  .acc summary svg{width:22px;height:22px;transition:.2s}
+  .acc details[open] summary svg{transform:rotate(180deg)}
+  .acc p{padding:0 12px 14px;font-size:14px;line-height:1.5;color:#333}
+  .sticky{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;bottom:0;background:#1b1e21;padding:12px 16px;z-index:5}
+  .sticky-price{font-size:28px;font-weight:700;text-transform:uppercase;color:#fff;white-space:nowrap}
+  .sticky .btn-add{flex:1;max-width:230px;height:50px;font-family:"Barlow Condensed",Oswald,sans-serif;text-transform:uppercase;font-size:19px;font-weight:700;letter-spacing:.02em;border-radius:8px}
+  .sticky .btn-add svg{width:24px;height:24px}
+}
+
+/* ---- sertar (coș / favorite / meniu) ---- */
+.drawer{position:fixed;inset:0;z-index:120;display:none}
+.drawer.open{display:block}
+.drawer-bg{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.drawer-p{position:absolute;top:0;right:0;bottom:0;width:min(440px,100%);background:#f4f4f2;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.3)}
+.drawer-h{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #dad9d6}
+.drawer-h h2{font-family:Oswald,sans-serif;font-size:26px;text-transform:uppercase;font-weight:700}
+.drawer-x{width:38px;height:38px;display:grid;place-items:center;border-radius:50%}
+.drawer-x:hover{background:#e3e2df}
+.drawer-x svg{width:22px;height:22px}
+.drawer-b{flex:1;overflow:auto;padding:16px 20px}
+.empty{color:#666;font-size:14px;padding:10px 0}
+.ci{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #e1e0dd}
+.ci img{width:72px;height:54px;object-fit:cover;border-radius:8px}
+.ci-b{min-width:0}
+.ci-b b{display:block;font-size:15px}
+.ci-b span{display:block;font-size:12px;color:#666;line-height:1.35}
+.ci-q{display:flex;align-items:center;gap:6px;margin-top:6px}
+.ci-q button{width:26px;height:26px;border-radius:6px;background:#e6e4e3;display:grid;place-items:center}
+.ci-q button svg{width:14px;height:14px}
+.ci-q em{font-style:normal;font-weight:600;min-width:18px;text-align:center}
+.ci-rm{margin-left:6px;color:#8a1f10!important;background:none!important}
+.ci-p{font-family:Oswald,sans-serif;font-size:18px;font-weight:600;white-space:nowrap}
+.drawer-f{border-top:1px solid #dad9d6;padding:14px 20px 18px;background:#f4f4f2}
+.tot{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.tot b{font-family:Oswald,sans-serif;font-size:24px}
+.ofrm{display:grid;gap:8px}
+.ofrm input[type=text],.ofrm input[type=tel]{height:40px;border:1px solid #cfcfcc;border-radius:8px;padding:0 12px;background:#fff;font-size:14px;outline:0}
+.ofrm input:focus{border-color:#F85C40}
+.ofrm label.gd{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#444;line-height:1.35}
+.ofrm label.gd input{margin-top:2px;accent-color:#F85C40}
+.ofrm .btn-add{height:46px;font-size:17px}
+.form-msg{font-size:13px;min-height:16px}
+.form-msg.ok{color:#1d7a3a;font-weight:600}
+.form-msg.err{color:#c0392b}
+.form-msg:empty{display:none}
+
+:root{--coral:#FE593E;--hd:#15191b}
+body{background:#45484b;min-height:100vh;display:flex;flex-direction:column}
+.ah{background:var(--hd);color:#fff;display:flex;align-items:center;height:70px;padding:0 32px;position:sticky;top:0;z-index:50}
+.ah-back{display:none}
+.ah-logo{display:flex;align-items:center;gap:16px;font-family:Oswald,sans-serif;font-weight:700;font-size:38px;line-height:1}
+.ah-logo span{font-family:Inter,sans-serif;font-weight:500;font-size:14px;letter-spacing:.32em;color:#fff}
+.ah-div{width:1px;height:40px;background:rgba(255,255,255,.35);margin:0 36px 0 40px}
+.steps{display:flex;gap:92px;margin-left:50px;align-self:stretch;align-items:center}
+.step{display:flex;align-items:center;gap:14px;font-family:Oswald,sans-serif;text-transform:uppercase;position:relative;height:100%}
+.step b{font-weight:700;font-size:24px;color:#cfcfcf;line-height:1}
+.step span{font-weight:500;font-size:18px;letter-spacing:.04em;color:#b5b5b5}
+.step.on b{color:var(--coral)}
+.step.on span{color:#fff}
+.step.on::after{content:"";position:absolute;left:0;right:0;bottom:12px;height:3px;background:var(--coral)}
+.step i{display:none}
+.ah-r{margin-left:auto;display:flex;align-items:center;gap:0}
+.ah-save{display:flex;align-items:center;gap:12px;font-size:17px;font-weight:500;position:relative}
+.ah-save svg{width:22px;height:22px}
+.ah-save.on{color:var(--coral)}
+.ah-save.on svg{fill:var(--coral)}
+.ah-save .badge{right:-14px;top:-8px}
+.ah-cart{display:none}
+main{padding:4px 3px 0}
+#cfg .gal-main{min-height:505px}
+#cfg .gal-thumbs{padding:14px 30px 16px}
+#cfg .infos{padding:12px 9px 0}
+.af{color:#c3c6c9;font-size:11.5px;text-align:center;padding:12px 16px 14px;line-height:1.4;margin-top:auto}
+.af a{color:var(--coral);font-weight:600}
+.af a:hover{text-decoration:underline}
+.row.hl{animation:hl 1.2s}
+@keyframes hl{0%{background:rgba(254,89,62,.18)}100%{background:transparent}}
+/* rezumat */
+.sum{display:grid;gap:10px}
+.sum-img{border-radius:10px;overflow:hidden;aspect-ratio:16/9;background:#ddd}
+.sum-img img{width:100%;height:100%;object-fit:cover}
+.sum h3{font-family:Oswald,sans-serif;font-size:24px;text-transform:uppercase}
+.sum dl{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;font-size:14px}
+.sum dt{color:#666}
+.sum dd{font-weight:600}
+.sum .tot b{color:#161718}
+@media (max-width:768px){
+  body{background:#f5f4f2}
+  .ah{flex-wrap:wrap;height:auto;padding:0 16px}
+  .ah-back{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:500;color:#fff;height:56px}
+  .ah-back svg{width:24px;height:24px}
+  .ah-logo{position:absolute;left:50%;top:0;height:56px;transform:translateX(-50%);font-size:28px;gap:10px}
+  .ah-logo span{font-size:11px;letter-spacing:.3em}
+  .ah-div,.ah-save{display:none}
+  .ah-r{height:56px}
+  .ah-cart{display:block;position:relative;width:26px;height:26px}
+  .ah-cart svg{width:26px;height:26px}
+  .ah-cart .badge{top:-8px;right:-10px}
+  .steps{order:5;width:100%;margin:0;gap:0;height:48px;justify-content:space-between;align-items:center;padding:0 2px}
+  .step{gap:6px;height:auto;min-width:0}
+  .step b{font-size:19px}
+  .step span{font-size:12.5px;letter-spacing:.01em;white-space:nowrap}
+  .step.on::after{display:none}
+  .step.on span{color:var(--coral)}
+  .step i{display:block;flex:1;min-width:12px;height:1px;background:rgba(255,255,255,.35);margin:0 8px}
+  .step:last-child i{display:none}
+  main{padding:0}
+  #cfg .gal-main{min-height:0}
+  #cfg .gal-thumbs{padding:4px 16px 14px}
+  #cfg .infos{padding:0}
+  .af{background:#1b1e21;padding-bottom:16px}
+}
+@media (min-width:769px) and (max-width:1200px){
+  .ah{padding:0 18px}.ah-div{margin:0 18px}.steps{gap:40px;margin-left:10px}.step span{font-size:16px}
+}
+</style>
+</head>
+<body>
+<header class="ah">
+  <a class="ah-back" href="https://github.com/MamaMia2026/mobila-demo-4-site" onclick="if(history.length>1){history.back();return false}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 6l-6 6 6 6"/></svg><span>Înapoi</span></a>
+  <div class="ah-logo">FORMA<span>STUDIO</span></div>
+  <i class="ah-div"></i>
+  <nav class="steps" aria-label="Pași">
+    <button class="step on" data-step="1"><b>01</b><span>Produs</span><i></i></button>
+    <button class="step" data-step="2"><b>02</b><span>Personalizare</span><i></i></button>
+    <button class="step" data-step="3"><b>03</b><span>Rezumat</span></button>
+  </nav>
+  <i class="ah-div"></i>
+  <div class="ah-r">
+    <button class="ah-save" id="h-save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span>Salvează</span><span class="badge zero fav-count">0</span></button>
+    <button class="ah-cart" id="h-cart" aria-label="Coș"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 10.5a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.2L21 8H6.1"/><circle cx="10" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg><span class="badge cart-count show-zero">0</span></button>
+  </div>
+</header>
+
+<main id="cfg"></main>
+
+<footer class="af">Machetă demo · Site realizat de CristianWeb · <a href="https://cristianweb.ro" target="_blank" rel="noopener">Vreau un site ca acesta →</a></footer>
+
+<!-- rezumat -->
+<div class="drawer" id="dr-sum"><div class="drawer-bg" data-close></div><div class="drawer-p"><div class="drawer-h"><h2>03 · Rezumat</h2><button class="drawer-x" data-close aria-label="Închide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button></div><div class="drawer-b"><div class="sum" id="sum"></div></div><div class="drawer-f"><div class="tot"><span>Preț configurație</span><b id="sum-price">0 lei</b></div><div class="cta" style="grid-template-columns:1fr 1fr;margin-top:0"><button class="btn-add" id="sum-add" style="height:48px;font-size:17px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 10.5a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.2L21 8H6.1"/><circle cx="10" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg><span>Adaugă în coș</span></button><button class="btn-save" id="sum-save" style="height:48px;font-size:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span>Salvează</span></button></div></div></div></div>
+
+<!-- coș -->
+<div class="drawer" id="dr-cart"><div class="drawer-bg" data-close></div><div class="drawer-p"><div class="drawer-h"><h2>Coșul tău</h2><button class="drawer-x" data-close aria-label="Închide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button></div><div class="drawer-b" id="cart-list"></div>
+<div class="drawer-f"><div class="tot"><span>Total</span><b id="cart-total">0 lei</b></div>
+<form class="ofrm" id="order-form" novalidate><input type="text" name="nume" placeholder="Nume și prenume" aria-label="Nume"><input type="tel" name="telefon" placeholder="Telefon" aria-label="Telefon"><input type="text" name="adresa" placeholder="Adresa de livrare" aria-label="Adresă"><label class="gd"><input type="checkbox" name="gdpr"> Sunt de acord cu prelucrarea datelor personale conform GDPR.</label><button type="submit" class="btn-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 10.5a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.2L21 8H6.1"/><circle cx="10" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg><span>Trimite comanda</span></button><div class="form-msg" aria-live="polite"></div></form></div></div></div>
+
+<!-- favorite -->
+<div class="drawer" id="dr-fav"><div class="drawer-bg" data-close></div><div class="drawer-p"><div class="drawer-h"><h2>Salvate</h2><button class="drawer-x" data-close aria-label="Închide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button></div><div class="drawer-b" id="fav-list"></div></div></div>
+
+<script>
+/* ===== FORMA demo – cod comun (date produse, configurator, coș, favorite) ===== */
+'use strict';
+const ICONS = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.4-7.5 10-7.5 10Z"/></svg>',
+  cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 10.5a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.2L21 8H6.1"/><circle cx="10" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>',
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>',
+  chevD:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 9 7 7 7-7"/></svg>',
+  bookmark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>',
+  image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 9"/></svg>',
+  cube:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>',
+  rotate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 3v5h-5"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-2"/></svg>',
+  redo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h2"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12A7 7 0 0 0 5 10c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>',
+  layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.5 3.4 9.3 8 11 4.6-1.7 8-5.5 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
+  swatch:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h10v10H4z"/><path d="M8 8V5h12v12h-3"/><path d="M4 12h10M9 8v10"/></svg>',
+  instagram:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".8" fill="currentColor"/></svg>',
+  facebook:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.3c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.3v2.3H7.4V14h2.8v8z"/></svg>',
+  linkedin:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.4 9.5H3.5V21h2.9zM4.9 4a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4zM20.5 21v-6.3c0-3.4-.7-6-4.7-6a4.1 4.1 0 0 0-3.7 2h-.1V9.5h-2.8V21h2.9v-5.7c0-1.5.3-3 2.2-3s1.9 1.8 1.9 3.1V21z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  minus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
+};
+const fmt = n => n.toLocaleString('ro-RO') + ' lei';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- produse ---------- */
+const PRODUCTS = [
+  { id:'axis', name:'AXIS', title:'Canapea AXIS', cat:'canapele', desc:'Canapea modulară, profil jos', descM:'Canapea modulară', price:7290, type:'sofa',
+    dims:{l:230,w:96,h:76},
+    imgs:['images/axis-main.webp','images/axis-thumb-2.webp','images/axis-thumb-3.webp','images/axis-thumb-4.webp'],
+    thumbs:['images/axis-thumb-1.webp','images/axis-thumb-2.webp','images/axis-thumb-3.webp','images/axis-thumb-4.webp'],
+    opts:{
+      cfg:[{k:'2 locuri',d:-1300,dims:{l:180}},{k:'3 locuri',d:0},{k:'Colțar',d:2900,dims:{l:290,w:180}}],
+      mat:[{k:'Catifea',d:0,sw:'images/sw-catifea.webp'},{k:'Țesătură',d:-600,sw:'images/sw-tesatura.webp'},{k:'Piele',d:1800,sw:'images/sw-piele.webp'}],
+      col:[{k:'Coral ruginiu',km:'Teracotă',d:0,sw:'images/sw-coral.webp'},{k:'Grafit',d:0,sw:'images/sw-grafit.webp'},{k:'Alb',d:0,sw:'images/sw-alb.webp'}],
+      base:[{k:'Negru',d:0,sw:'images/sw-negru.webp'},{k:'Crom',d:250,sw:'images/sw-crom.webp'}]
+    },
+    info:{dim:'Proporții echilibrate, cu profil jos și prezență arhitecturală.', mat:'Catifea premium, țesătură rezistentă sau piele cu textură naturală. Întreținere simplă, cu produse dedicate.'}
+  },
+  { id:'arc', name:'ARC', title:'Fotoliu ARC', cat:'fotolii', desc:'Fotoliu sculptural', descM:'Fotoliu sculptural', price:2490, type:'chair',
+    dims:{l:86,w:80,h:72},
+    imgs:['images/arc-card.webp','images/arc-detail-2.webp','images/arc-detail-3.webp','images/arc-detail-4.webp'],
+    thumbs:['images/arc-card.webp','images/arc-detail-2.webp','images/arc-detail-3.webp','images/arc-detail-4.webp'],
+    opts:{
+      cfg:[{k:'Standard',d:0},{k:'Lounge',d:400,dims:{l:98,w:88}},{k:'Cu taburet',d:900,dims:{w:130}}],
+      mat:[{k:'Bouclé',d:0,sw:'images/sw-tesatura.webp'},{k:'Țesătură',d:-200,sw:'images/sw-tesatura.webp'},{k:'Piele',d:1200,sw:'images/sw-piele.webp'}],
+      col:[{k:'Negru',d:0,sw:'images/sw-negru.webp'},{k:'Grafit',d:0,sw:'images/sw-grafit.webp'},{k:'Coral ruginiu',d:0,sw:'images/sw-coral.webp'}],
+      base:[{k:'Negru',d:0,sw:'images/sw-negru.webp'},{k:'Crom',d:150,sw:'images/sw-crom.webp'}]
+    },
+    info:{dim:'Siluetă sculpturală, compactă, cu șezut generos.', mat:'Bouclé, țesătură sau piele cu textură naturală. Întreținere simplă, cu produse dedicate.'}
+  },
+  { id:'frame', name:'FRAME', title:'Masă FRAME', cat:'mese', desc:'Masă de cafea din sticlă fumurie', descM:'Masă din sticlă fumurie', price:1690, type:'table',
+    dims:{l:120,w:60,h:38},
+    imgs:['images/frame-card.webp','images/frame-detail-2.webp','images/frame-detail-3.webp','images/frame-detail-4.webp'],
+    thumbs:['images/frame-card.webp','images/frame-detail-2.webp','images/frame-detail-3.webp','images/frame-detail-4.webp'],
+    opts:{
+      cfg:[{k:'90 cm',d:-300,dims:{l:90,w:50}},{k:'120 cm',d:0},{k:'150 cm',d:450,dims:{l:150,w:70}}],
+      mat:[{k:'Sticlă 10 mm',d:0,sw:'images/sw-grafit.webp'},{k:'Sticlă 12 mm',d:250,sw:'images/sw-grafit.webp'}],
+      col:[{k:'Fumuriu',d:0,sw:'images/sw-grafit.webp'},{k:'Transparent',d:0,sw:'images/sw-alb.webp'},{k:'Bronz',d:200,sw:'images/sw-coral.webp'}],
+      base:[{k:'Sticlă',d:0,sw:'images/sw-grafit.webp'},{k:'Oțel negru',d:300,sw:'images/sw-negru.webp'}]
+    },
+    info:{dim:'Volum transparent, cu muchii drepte și prezență discretă.', mat:'Sticlă securizată, fumurie, cu muchii șlefuite. Întreținere simplă, cu produse dedicate.'}
+  },
+  { id:'line', name:'LINE', title:'Sistem LINE', cat:'depozitare', desc:'Sistem de depozitare modular', descM:'Sistem de depozitare modular', price:3490, type:'storage',
+    dims:{l:240,w:45,h:62},
+    imgs:['images/line-card.webp','images/line-detail-2.webp','images/line-detail-3.webp','images/line-detail-4.webp'],
+    thumbs:['images/line-card.webp','images/line-detail-2.webp','images/line-detail-3.webp','images/line-detail-4.webp'],
+    opts:{
+      cfg:[{k:'2 module',d:-900,dims:{l:160}},{k:'3 module',d:0},{k:'4 module',d:1100,dims:{l:320}}],
+      mat:[{k:'MDF vopsit',d:0,sw:'images/sw-grafit.webp'},{k:'Furnir stejar',d:600,sw:'images/sw-coral.webp'},{k:'Piatră',d:1900,sw:'images/sw-tesatura.webp'}],
+      col:[{k:'Grafit',d:0,sw:'images/sw-grafit.webp'},{k:'Alb',d:0,sw:'images/sw-alb.webp'},{k:'Coral ruginiu',d:0,sw:'images/sw-coral.webp'}],
+      base:[{k:'Negru',d:0,sw:'images/sw-negru.webp'},{k:'Crom',d:250,sw:'images/sw-crom.webp'}]
+    },
+    info:{dim:'Linie continuă, joasă, cu fronturi fără mânere.', mat:'MDF vopsit mat, furnir de stejar sau piatră sinterizată. Întreținere simplă, cu produse dedicate.'}
+  }
+];
+const byId = id => PRODUCTS.find(p => p.id === id);
+const DEFAULT_STATE = { cfg:1, mat:0, col:0, base:0 };
+
+function calc(p, s) {
+  const o = p.opts;
+  const parts = [o.cfg[s.cfg], o.mat[s.mat], o.col[s.col], o.base[s.base]];
+  const price = p.price + parts.reduce((a, x) => a + (x.d || 0), 0);
+  const dims = Object.assign({}, p.dims, o.cfg[s.cfg].dims || {});
+  return { price, dims, parts };
+}
+const dimText = d => `${d.l} × ${d.w} × ${d.h} cm`;
+
+/* ---------- desen dimensiuni (SVG) ---------- */
+function dimSVG(p, s) {
+  const { dims } = calc(p, s);
+  const st = 'fill="none" stroke="#2a2a2a" stroke-width="1.6" stroke-linejoin="round"';
+  const stL = 'fill="none" stroke="#2a2a2a" stroke-width="1.2"';
+  const txt = 'font-family="Inter,system-ui,sans-serif" font-size="12" fill="#2a2a2a" text-anchor="middle"';
+  let front = '', side = '';
+  const W = 240, body = 220, x0 = 10;
+  if (p.type === 'sofa') {
+    const n = s.cfg === 0 ? 2 : 3;
+    const corner = s.cfg === 2;
+    front = `<rect x="${x0}" y="22" width="${body}" height="40" rx="5" ${st}/>`;
+    front += `<path d="M${x0+8} 22v-8h${body-16}v8" ${st}/>`;
+    for (let i = 1; i < n; i++) front += `<path d="M${x0 + (body/n)*i} 26v34" ${st}/>`;
+    front += `<path d="M${x0+2} 30h${body-4}" ${st}/>`;
+    front += `<path d="M${x0+14} 62v8M${x0+body-14} 62v8" ${st}/>`;
+    if (corner) front += `<rect x="${x0+body-64}" y="10" width="56" height="14" rx="3" ${st}/>`;
+    side = `<path d="M8 40c0-6 3-8 8-8h6V22h30c5 0 8 2 10 6l4 10" ${st}/><rect x="8" y="40" width="60" height="22" rx="4" ${st}/><path d="M16 62v8M60 62v8" ${st}/>`;
+  } else if (p.type === 'chair') {
+    front = `<path d="M${x0+40} 20c0-8 8-12 20-12h100c12 0 20 4 20 12v26h-20v16H${x0+60}V46h-20z" ${st}/><path d="M${x0+70} 46h80" ${st}/><path d="M${x0+70} 62v8M${x0+150} 62v8" ${st}/>`;
+    side = `<path d="M14 24c0-8 6-12 12-12h30c6 0 10 4 10 12v22H56v16H14z" ${st}/><path d="M22 62v8M50 62v8" ${st}/>`;
+  } else if (p.type === 'table') {
+    front = `<rect x="${x0}" y="34" width="${body}" height="6" rx="1" ${st}/><path d="M${x0+10} 40v30M${x0+body-10} 40v30M${x0+10} 70h${body-20}" ${st}/>`;
+    side = `<rect x="10" y="34" width="56" height="6" rx="1" ${st}/><path d="M16 40v30M60 40v30M16 70h44" ${st}/>`;
+  } else {
+    const n = s.cfg + 2;
+    front = `<rect x="${x0}" y="24" width="${body}" height="40" rx="2" ${st}/>`;
+    for (let i = 1; i < n; i++) front += `<path d="M${x0 + (body/n)*i} 24v40" ${st}/>`;
+    front += `<path d="M${x0+10} 64v6M${x0+body-10} 64v6" ${st}/>`;
+    side = `<rect x="22" y="24" width="32" height="40" rx="2" ${st}/><path d="M26 64v6M50 64v6" ${st}/>`;
+  }
+  const arrowH = (x1, x2, y, label) => `<path d="M${x1} ${y}h${x2-x1}" ${stL}/><path d="M${x1} ${y-4}v8M${x2} ${y-4}v8" ${stL}/><text x="${(x1+x2)/2}" y="${y+16}" ${txt}>${label}</text>`;
+  const arrowV = (x, y1, y2, label) => `<path d="M${x} ${y1}v${y2-y1}" ${stL}/><path d="M${x-4} ${y1}h8M${x-4} ${y2}h8" ${stL}/><text x="${x+8}" y="${(y1+y2)/2+4}" ${txt.replace('middle','start')}>${label}</text>`;
+  const f = `<svg class="dim-front" viewBox="0 0 ${W} 100" width="${W}" height="100">${front}${arrowH(x0, x0+body, 82, dims.l + ' cm')}</svg>`;
+  const sd = `<svg class="dim-side" viewBox="0 0 150 100" width="150" height="100">${side}${arrowH(8, 68, 82, dims.w + ' cm')}${arrowV(86, 12, 70, dims.h + ' cm')}</svg>`;
+  return f + sd;
+}
+
+/* ---------- store (coș / favorite) ---------- */
+function makeStore(prefix) {
+  const read = k => { try { return JSON.parse(localStorage.getItem(prefix + k) || 'null'); } catch (e) { return null; } };
+  const write = (k, v) => { try { localStorage.setItem(prefix + k, JSON.stringify(v)); } catch (e) {} };
+  return { read, write };
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg, ms = 2600) {
+  let el = document.getElementById('toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+/* ---------- cod poștal ---------- */
+function checkPostcode(v) {
+  const z = (v || '').trim();
+  if (!/^\d{6}$/.test(z)) return { ok:false, msg:'Introdu un cod poștal valid, cu 6 cifre (ex. 010000).' };
+  const zone = z[0] === '0' ? 'București–Ilfov' : 'județul tău';
+  return { ok:true, msg:`Livrare disponibilă în ${zone}: 5–7 zile lucrătoare, montaj inclus (demo).` };
+}
+
+/* ---------- configurator ---------- */
+function Configurator(p, root, env) {
+  // env: { mobileLabels:boolean, onAdd(fn), onSave(fn), mode:'app'|'site' }
+  const state = Object.assign({}, DEFAULT_STATE);
+  let gi = 0, view = 'photo';
+  const $ = sel => root.querySelector(sel);
+  const $$ = sel => Array.from(root.querySelectorAll(sel));
+  const o = p.opts;
+  const isM = () => window.matchMedia('(max-width: 768px)').matches;
+  const colLabel = c => (isM() && c.km) ? c.km : c.k;
+
+  function pills(key, arr) {
+    return `<div class="seg" data-key="${key}">${arr.map((x, i) => `<button type="button" class="seg-btn${i === state[key] ? ' on' : ''}" data-i="${i}">${esc(x.k)}</button>`).join('')}</div>`;
+  }
+  function chips(key, arr) {
+    return `<div class="chips" data-key="${key}">${arr.map((x, i) => `<button type="button" class="chip${i === state[key] ? ' on' : ''}" data-i="${i}"><span class="chip-sw"><img src="${x.sw}" alt=""></span><span class="chip-l">${esc(key === 'col' ? colLabel(x) : x.k)}</span><span class="chip-ck">${ICONS.check}</span></button>`).join('')}</div>`;
+  }
+  function bigSw(key, arr) {
+    return `<div class="bigsw" data-key="${key}">${arr.map((x, i) => `<button type="button" class="bsw${i === state[key] ? ' on' : ''}" data-i="${i}"><span class="bsw-img"><img src="${x.sw}" alt=""><i>${ICONS.check}</i></span><span class="bsw-l">${esc(key === 'col' ? colLabel(x) : x.k)}</span></button>`).join('')}</div>`;
+  }
+
+  root.innerHTML = `
+  <div class="cfg-grid">
+    <section class="gal">
+      <div class="gal-main"><img id="gal-img" src="${p.imgs[0]}" alt="${esc(p.title)}">
+        <div class="gal-tools">
+          <div class="gal-view">
+            <button type="button" class="gv on" data-v="photo">${ICONS.image}<span>Fotografii</span></button>
+            <button type="button" class="gv" data-v="3d"><i class="d">${ICONS.cube}</i><span class="d">Vizualizare 3D</span><i class="m">${ICONS.rotate}</i><span class="m">3D rotate</span></button>
+          </div>
+          <div class="gal-rot"><button type="button" class="gr" data-d="-1" aria-label="Imaginea anterioară">${ICONS.undo}</button><i></i><button type="button" class="gr" data-d="1" aria-label="Imaginea următoare">${ICONS.redo}</button></div>
+        </div>
+      </div>
+      <div class="gal-thumbs">${p.thumbs.map((t, i) => `<button type="button" class="th${i === 0 ? ' on' : ''}" data-i="${i}"><img src="${t}" alt="${esc(p.name)} – imagine ${i+1}"></button>`).join('')}</div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h1 class="p-title">${esc(p.title)}</h1><div class="p-price" id="p-price">${fmt(p.price)}</div></div>
+      <div class="p-sub">Personalizează piesa</div>
+      <div class="row"><div class="row-l"><b>Configurație</b><span class="m">Alege dimensiunea potrivită.</span></div>${pills('cfg', o.cfg)}</div>
+      <div class="row"><div class="row-l"><b>Material</b><span class="m">Selectează tipul de material.</span></div><div class="d">${chips('mat', o.mat)}</div><div class="m">${pills('mat', o.mat)}</div></div>
+      <div class="row"><div class="row-l"><b>Culoare</b><span class="m">Alege culoarea tapițeriei.</span></div><div class="d">${chips('col', o.col)}</div><div class="m">${bigSw('col', o.col)}</div></div>
+      <div class="row"><div class="row-l"><b>Bază</b><span class="m">Selectează finisajul bazei.</span></div><div class="d">${chips('base', o.base)}</div><div class="m">${pills('base', o.base)}</div></div>
+      <div class="row row-dim"><div class="row-l"><b>Dimensiuni</b><span class="d dim-d" id="dim-d">${dimText(p.dims)}</span><span class="m">Dimensiunile ${p.type==='sofa'?'canapelei':'piesei'} selectate.</span></div>
+        <div class="dim-wrap"><div class="dim-draw" id="dim-draw">${dimSVG(p, state)}</div><div class="dim-m m" id="dim-m">${dimText(p.dims)} (L × A × Î)</div></div></div>
+      <button type="button" class="btn-samples m" id="btn-samples">${ICONS.swatch}<span>Solicită mostre</span></button>
+      <div class="row row-ship">
+        <div class="row-l ship-l"><span class="ship-ico m">${ICONS.truck}</span><div><b class="d">Verifică livrarea</b><b class="m">Livrare &amp; montaj</b><span class="d">Introdu codul poștal pentru a vedea disponibilitatea.</span><span class="m">Verifică disponibilitatea în zona ta.</span></div></div>
+        <form class="ship" id="ship-form" novalidate><label class="ship-in">${ICONS.pin}<input type="text" inputmode="numeric" id="zip" placeholder="Cod poștal (ex. 010000)" data-m="Cod poștal (ex. 010001)" aria-label="Cod poștal"></label><button type="submit" class="btn-verify">Verifică</button></form>
+        <div class="ship-msg" id="ship-msg" aria-live="polite"></div>
+      </div>
+      <div class="cta d"><button type="button" class="btn-add" id="btn-add">${ICONS.cart}<span>Adaugă în coș</span></button><button type="button" class="btn-save" id="btn-save">${ICONS.bookmark}<span>Salvează</span></button></div>
+    </section>
+  </div>
+  <section class="infos d">
+    <article><h3>Dimensiuni ${ICONS.box}</h3><p><b id="info-dim">${dimText(p.dims)}.</b><br>${esc(p.info.dim)}</p></article>
+    <article><h3>Materiale &amp; îngrijire ${ICONS.layers}</h3><p>${esc(p.info.mat)}</p></article>
+    <article><h3>Livrare &amp; montaj ${ICONS.truck}</h3><p>Livrare în toată România, cu manipulare atentă. Montaj inclus, realizat de echipa FORMA.</p></article>
+    <article><h3>Garanție ${ICONS.shield}</h3><p>Calitate controlată și suport dedicat pentru o experiență fără griji.</p></article>
+  </section>
+  <section class="acc m">
+    <details><summary>Detalii produs ${ICONS.chevD}</summary><p><b id="info-dim-m">${dimText(p.dims)}.</b> ${esc(p.info.dim)}</p></details>
+    <details><summary>Materiale &amp; îngrijire ${ICONS.chevD}</summary><p>${esc(p.info.mat)}</p></details>
+    <details><summary>Livrare și retur ${ICONS.chevD}</summary><p>Livrare în toată România, cu manipulare atentă. Montaj inclus, realizat de echipa FORMA. Retur în 14 zile.</p></details>
+    <details><summary>Garanție ${ICONS.chevD}</summary><p>Calitate controlată și suport dedicat pentru o experiență fără griji. Garanție 5 ani pentru structură.</p></details>
+  </section>
+  <div class="sticky m"><div class="sticky-price" id="sticky-price">${fmt(p.price)}</div><button type="button" class="btn-add" id="btn-add-m">${ICONS.cart}<span>Adaugă în coș</span></button></div>`;
+
+  function refresh() {
+    const r = calc(p, state);
+    const price = fmt(r.price), dt = dimText(r.dims);
+    $('#p-price').textContent = price; $('#sticky-price').textContent = price;
+    $('#dim-d').textContent = dt; $('#dim-m').textContent = dt + ' (L × A × Î)';
+    $('#info-dim').textContent = dt + '.'; $('#info-dim-m').textContent = dt + '.';
+    $('#dim-draw').innerHTML = dimSVG(p, state);
+    $$('[data-key]').forEach(g => { const k = g.dataset.key; g.querySelectorAll('[data-i]').forEach(b => b.classList.toggle('on', +b.dataset.i === state[k])); });
+    root.dispatchEvent(new CustomEvent('cfgchange', { detail: { state: Object.assign({}, state), price: r.price, dims: r.dims } }));
+  }
+  root.addEventListener('click', e => {
+    const b = e.target.closest('[data-key] [data-i]');
+    if (b) { state[b.closest('[data-key]').dataset.key] = +b.dataset.i; refresh(); return; }
+    const th = e.target.closest('.th');
+    if (th) { setImg(+th.dataset.i); return; }
+    const gr = e.target.closest('.gr');
+    if (gr) { setImg((gi + (+gr.dataset.d) + p.imgs.length) % p.imgs.length); return; }
+    const gv = e.target.closest('.gv');
+    if (gv) { view = gv.dataset.v; $$('.gv').forEach(x => x.classList.toggle('on', x === gv)); $('.gal-main').classList.toggle('spin', view === '3d'); if (view === '3d') toast('Vizualizare 3D – demo: imaginea se rotește.'); return; }
+  });
+  function setImg(i) { gi = i; $('#gal-img').src = p.imgs[i]; $$('.th').forEach((t, k) => t.classList.toggle('on', k === i)); }
+  $('#ship-form').addEventListener('submit', e => { e.preventDefault(); const r = checkPostcode($('#zip').value); const m = $('#ship-msg'); m.textContent = r.msg; m.className = 'ship-msg ' + (r.ok ? 'ok' : 'err'); });
+  const smp = $('#btn-samples'); if (smp) smp.addEventListener('click', () => toast('Mostre solicitate – te contactăm în 24h (demo).'));
+  const zip = $('#zip'); const fixPh = () => { zip.placeholder = isM() ? zip.dataset.m : 'Cod poștal (ex. 010000)'; }; fixPh(); window.addEventListener('resize', fixPh);
+  const item = () => { const r = calc(p, state); return { id: p.id, name: p.title, price: r.price, opts: r.parts.map(x => x.k).join(' · '), dims: dimText(r.dims), img: p.thumbs[0] }; };
+  ['#btn-add', '#btn-add-m'].forEach(s => $(s).addEventListener('click', () => env.onAdd(item())));
+  $('#btn-save').addEventListener('click', () => env.onSave(item()));
+  return { state, refresh, item, get price() { return calc(p, state).price; }, setState(s) { Object.assign(state, s); refresh(); } };
+}
+
+/* ---------- coș ---------- */
+function Cart(store, els) {
+  // els: { drawer, list, total, count: [badges], form }
+  let items = store.read('cart') || [];
+  const save = () => { store.write('cart', items); render(); };
+  const qty = () => items.reduce((a, x) => a + x.q, 0);
+  function render() {
+    const n = qty();
+    els.count.forEach(b => { b.textContent = n; b.classList.toggle('zero', n === 0); });
+    if (!els.list) return;
+    if (!items.length) { els.list.innerHTML = '<p class="empty">Coșul tău este gol.</p>'; }
+    else els.list.innerHTML = items.map((x, i) => `<div class="ci"><img src="${x.img}" alt=""><div class="ci-b"><b>${esc(x.name)}</b><span>${esc(x.opts)}</span><span class="ci-d">${esc(x.dims)}</span><div class="ci-q"><button type="button" data-q="-1" data-i="${i}" aria-label="Scade">${ICONS.minus}</button><em>${x.q}</em><button type="button" data-q="1" data-i="${i}" aria-label="Crește">${ICONS.plus}</button><button type="button" class="ci-rm" data-rm="${i}" aria-label="Elimină">${ICONS.trash}</button></div></div><div class="ci-p">${fmt(x.price * x.q)}</div></div>`).join('');
+    els.total.textContent = fmt(items.reduce((a, x) => a + x.price * x.q, 0));
+  }
+  if (els.list) els.list.addEventListener('click', e => {
+    const q = e.target.closest('[data-q]'); if (q) { const it = items[+q.dataset.i]; it.q = Math.max(1, it.q + (+q.dataset.q)); save(); return; }
+    const rm = e.target.closest('[data-rm]'); if (rm) { items.splice(+rm.dataset.rm, 1); save(); }
+  });
+  if (els.form) els.form.addEventListener('submit', e => {
+    e.preventDefault();
+    const f = els.form; const msg = f.querySelector('.form-msg');
+    if (!items.length) { msg.textContent = 'Coșul este gol.'; msg.className = 'form-msg err'; return; }
+    const nume = f.nume.value.trim(), tel = f.telefon.value.trim(), adr = f.adresa.value.trim();
+    if (nume.length < 3) { msg.textContent = 'Te rugăm să completezi numele.'; msg.className = 'form-msg err'; f.nume.focus(); return; }
+    if (!/^[+0-9 ()./-]{9,}$/.test(tel)) { msg.textContent = 'Te rugăm să introduci un număr de telefon valid.'; msg.className = 'form-msg err'; f.telefon.focus(); return; }
+    if (adr.length < 6) { msg.textContent = 'Te rugăm să completezi adresa de livrare.'; msg.className = 'form-msg err'; f.adresa.focus(); return; }
+    if (!f.gdpr.checked) { msg.textContent = 'Este necesar acordul pentru prelucrarea datelor.'; msg.className = 'form-msg err'; return; }
+    msg.textContent = 'Comandă trimisă (demo)'; msg.className = 'form-msg ok';
+    items = []; store.write('cart', items); render(); f.reset();
+    toast('Comandă trimisă (demo)');
+  });
+  render();
+  return {
+    add(it) { const key = it.id + '|' + it.opts; const ex = items.find(x => x.key === key); if (ex) ex.q++; else items.push(Object.assign({ key, q: 1 }, it)); save(); toast(`${it.name} a fost adăugat în coș.`); },
+    get items() { return items; }, render, qty
+  };
+}
+
+/* ---------- favorite ---------- */
+function Favs(store, els) {
+  let items = store.read('favs') || [];
+  const save = () => { store.write('favs', items); render(); };
+  function render() {
+    els.count.forEach(b => { b.textContent = items.length; b.classList.toggle('zero', items.length === 0); });
+    if (els.list) els.list.innerHTML = items.length ? items.map((x, i) => `<div class="ci"><img src="${x.img}" alt=""><div class="ci-b"><b>${esc(x.name)}</b><span>${esc(x.opts)}</span></div><div class="ci-p">${fmt(x.price)}</div><button type="button" class="ci-rm" data-rm="${i}" aria-label="Elimină">${ICONS.trash}</button></div>`).join('') : '<p class="empty">Nu ai produse salvate.</p>';
+    if (els.onRender) els.onRender(items);
+  }
+  if (els.list) els.list.addEventListener('click', e => { const rm = e.target.closest('[data-rm]'); if (rm) { items.splice(+rm.dataset.rm, 1); save(); } });
+  render();
+  return {
+    toggle(it) { const key = it.id + '|' + it.opts; const i = items.findIndex(x => x.key === key); if (i >= 0) { items.splice(i, 1); save(); toast(`${it.name} a fost scos de la favorite.`); return false; } items.push(Object.assign({ key }, it)); save(); toast(`${it.name} a fost salvat la favorite.`); return true; },
+    has(id) { return items.some(x => x.id === id); }, get items() { return items; }
+  };
+}
+
+(function(){
+  const store = makeStore('forma4_app_');
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  const p = byId('axis');
+  const cart = Cart(store, { list: $('#cart-list'), total: $('#cart-total'), count: $$('.cart-count'), form: $('#order-form') });
+  const favs = Favs(store, { list: $('#fav-list'), count: $$('.fav-count') });
+  const open = id => { $(id).classList.add('open'); document.body.style.overflow = 'hidden'; };
+  const closeAll = () => { $$('.drawer.open').forEach(d => d.classList.remove('open')); document.body.style.overflow = ''; };
+  document.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeAll(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+  const root = $('#cfg');
+  const syncSave = () => { const on = favs.items.some(x => x.key === p.id + '|' + cfg.item().opts); root.querySelector('#btn-save').classList.toggle('on', on); $('#h-save').classList.toggle('on', on); };
+  const cfg = Configurator(p, root, {
+    onAdd: it => { cart.add(it); open('#dr-cart'); },
+    onSave: it => { favs.toggle(it); syncSave(); }
+  });
+  root.addEventListener('cfgchange', syncSave); syncSave();
+  $('#h-save').addEventListener('click', () => { if (favs.items.length && $('#h-save').classList.contains('on')) open('#dr-fav'); else root.querySelector('#btn-save').click(); });
+  $('#h-cart').addEventListener('click', () => open('#dr-cart'));
+
+  // pași
+  const isM = () => window.matchMedia('(max-width:768px)').matches;
+  const setStep = n => $$('.step').forEach(s => s.classList.toggle('on', +s.dataset.step === n));
+  setStep(isM() ? 2 : 1);
+  function showSummary() {
+    const it = cfg.item(); const r = calc(p, cfg.state);
+    $('#sum').innerHTML = `<div class="sum-img"><img src="${p.imgs[0]}" alt=""></div><h3>${esc(p.title)}</h3><dl><dt>Configurație</dt><dd>${esc(r.parts[0].k)}</dd><dt>Material</dt><dd>${esc(r.parts[1].k)}</dd><dt>Culoare</dt><dd>${esc(r.parts[2].k)}</dd><dt>Bază</dt><dd>${esc(r.parts[3].k)}</dd><dt>Dimensiuni</dt><dd>${it.dims} (L × A × Î)</dd><dt>Livrare</dt><dd>5–7 zile lucrătoare, montaj inclus</dd></dl>`;
+    $('#sum-price').textContent = fmt(r.price);
+    open('#dr-sum');
+  }
+  $$('.step').forEach(s => s.addEventListener('click', () => {
+    const n = +s.dataset.step; setStep(n);
+    if (n === 1) { closeAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else if (n === 2) { closeAll(); const row = root.querySelector('.row'); if (isM()) row.scrollIntoView({ behavior: 'smooth', block: 'start' }); row.classList.remove('hl'); void row.offsetWidth; row.classList.add('hl'); }
+    else showSummary();
+  }));
+  $('#sum-add').addEventListener('click', () => { cart.add(cfg.item()); open('#dr-cart'); });
+  $('#sum-save').addEventListener('click', () => { favs.toggle(cfg.item()); syncSave(); });
+  window.FORMA = { cart, favs, cfg, showSummary };
+})();
+</script>
+</body>
+</html>
